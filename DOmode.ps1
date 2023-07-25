@@ -81,7 +81,7 @@ switch ($choice) {
     "2" {
         EnableDeliveryOptimization
     }
-    "3" {
+    "0" {
         Write-Output "Exiting..."
         return
     }
