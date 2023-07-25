@@ -63,9 +63,9 @@ function EnableDeliveryOptimization {
 }
 
 $choices = @(
-    "[]Disable Delivery Optimization",
-    "Enable Delivery Optimization",
-    "Exit"
+    "[1] Disable Delivery Optimization",
+    "[2] Enable Delivery Optimization",
+    "[0] Exit"
 )
 
 $choice = Read-Host "Select an option:`n$($choices -join "`n")"
