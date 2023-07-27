@@ -103,7 +103,7 @@ function CheckDeliveryOptimizationValue {
 }
 
 $choices = @(
-    "[1] Check Delivery Optimization value on both locations",
+    "[1] Check Delivery Optimization current values",
     "[2] Disable Delivery Optimization",
     "[3] Enable Delivery Optimization",
     "[0] Exit"
