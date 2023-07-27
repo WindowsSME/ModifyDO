@@ -62,41 +62,6 @@ function EnableDeliveryOptimization {
     }
 }
 
-$choices = @(
-    "[1] Disable Delivery Optimization",
-    "[2] Enable Delivery Optimization",
-    "[0] Exit"
-)
-
-$choice = Read-Host "Select an option:`n$($choices -join "`n")"
-
-$DODownloadModePath1 = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization"
-$DODownloadModePath2 = "HKLM:\SOFTWARE\Microsoft\PolicyManager\current\device\DeliveryOptimization"
-$ValueName = "DODownloadMode"
-
-switch ($choice) {
-    "1" {
-        DisableDeliveryOptimization
-    }
-    "2" {
-        EnableDeliveryOptimization
-    }
-    "0" {
-        Write-Output "Exiting..."
-        return
-    }
-    default {
-        Write-Output "Invalid choice. Exiting..."
-    }
-}
-
-foreach ($path in $paths) {
-    CheckRegistryValue -Path $path -ValueName $ValueName
-}
-
-$currentDownloadMode = (Get-DeliveryOptimizationPerfSnap).DownloadMode
-Write-Output "Current DownloadMode: $currentDownloadMode"
-
 function CheckRegistryValue {
     param (
         [string]$Path,
@@ -116,3 +81,59 @@ function CheckRegistryValue {
         Write-Output "Registry path '$Path' does not exist"
     }
 }
+
+function CheckDeliveryOptimizationValue {
+    param (
+        [string]$Path,
+        [string]$ValueName
+    )
+
+    if (Test-Path $Path) {
+        $registryKey = Get-ItemProperty -Path $Path -Name $ValueName -ErrorAction SilentlyContinue
+        if ($registryKey -ne $null) {
+            Write-Output "Registry value '$ValueName' in '$Path': $($registryKey.$ValueName)"
+        }
+        else {
+            Write-Output "Registry value '$ValueName' does not exist in '$Path'"
+        }
+    }
+    else {
+        Write-Output "Registry path '$Path' does not exist"
+    }
+}
+
+$choices = @(
+    "[1] Check Delivery Optimization value on both locations",
+    "[2] Disable Delivery Optimization",
+    "[3] Enable Delivery Optimization",
+    "[0] Exit"
+)
+
+$choice = Read-Host "Select an option:`n$($choices -join "`n")"
+
+$DODownloadModePath1 = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization"
+$DODownloadModePath2 = "HKLM:\SOFTWARE\Microsoft\PolicyManager\current\device\DeliveryOptimization"
+$ValueName = "DODownloadMode"
+
+switch ($choice) {
+    "1" {
+        CheckDeliveryOptimizationValue -Path $DODownloadModePath1 -ValueName $ValueName
+        CheckDeliveryOptimizationValue -Path $DODownloadModePath2 -ValueName $ValueName
+    }
+    "2" {
+        DisableDeliveryOptimization
+    }
+    "3" {
+        EnableDeliveryOptimization
+    }
+    "0" {
+        Write-Output "Exiting..."
+        return
+    }
+    default {
+        Write-Output "Invalid choice. Exiting..."
+    }
+}
+
+$currentDownloadMode = (Get-DeliveryOptimizationPerfSnap).DownloadMode
+Write-Output "Current DownloadMode: $currentDownloadMode"
